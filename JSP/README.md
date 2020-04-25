@@ -1,6 +1,8 @@
 # Heuristic methods for JobShop scheduling
 
-This repository contains the starter code for the assignment.
+This repository contains the Metaheuristics project made by **Anthony Salinas**. The base code was furnished by **INSA GEI's department**.
+You can find it at : https://github.com/insa-4ir-meta-heuristiques/template-jobshop
+My code was developped by using **Eclipse IDE**.
 
 
 ## Compile
