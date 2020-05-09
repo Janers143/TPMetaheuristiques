@@ -3,17 +3,26 @@ package jobshop;
 import jobshop.encodings.JobNumbers;
 import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
+import jobshop.solvers.DescentSolver;
+import jobshop.solvers.DescentSolver.Block;
+import jobshop.solvers.DescentSolver.Swap;
 import jobshop.solvers.EST_PriorityRule;
 import jobshop.solvers.GreedySolver;
 import jobshop.solvers.PriorityRule;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+@SuppressWarnings("unused")
 public class DebuggingMain {
 
     public static void main(String[] args) {
         try {
+        	/* Tests for the Greedy Solver */
+        	/*
             // load the aaa1 instance
             Instance instance = Instance.fromFile(Paths.get("instances/aaa1"));
 
@@ -131,6 +140,89 @@ public class DebuggingMain {
             System.out.println("SCHEDULE:\n" + estLrptRs.schedule);
             System.out.println("VALID: " + estLrptRs.schedule.isValid() + "\n");
             System.out.println("MAKESPAN: " + estLrptRs.schedule.makespan() + "\n");
+            */
+        	
+        	/* Tests for the descent solver */
+        	// load the aaa1 instance
+            Instance instance = Instance.fromFile(Paths.get("instances/myinstance"));
+        	ResourceOrder ro = new ResourceOrder(instance);
+        	
+        	// Filling it with the solution given in the exercise
+        	ro.tasksByMachine[0][0] = new Task(2,0);
+            ro.tasksByMachine[0][1] = new Task(1,1);
+            ro.tasksByMachine[0][2] = new Task(0,1);
+            
+            ro.tasksByMachine[1][0] = new Task(1,0);
+            ro.tasksByMachine[1][1] = new Task(2,1);
+            ro.tasksByMachine[1][2] = new Task(0,2);
+            
+            ro.tasksByMachine[2][0] = new Task(2,2);
+            ro.tasksByMachine[2][1] = new Task(0,0);
+            ro.tasksByMachine[2][2] = new Task(1,2);
+            
+            // Printing this solution
+            System.out.println("RESOURCE ORDER ENCODING:\n" + ro + "\n");
+            
+            Schedule sched = ro.toSchedule();
+            
+            System.out.println("SCHEDULE:\n" + sched);
+            System.out.println("VALID: " + sched.isValid() + "\n");
+            System.out.println("MAKESPAN: " + sched.makespan() + "\n");
+            
+            DescentSolver ds = new DescentSolver();
+            
+            List<Task> criticalPath = (List<Task>) sched.criticalPath();
+            Iterator<Task> it1 = criticalPath.iterator();
+            int counter = 1;
+            System.out.println("CRITICAL PATH:\n");
+            while(it1.hasNext()) {
+            	Task current = it1.next();
+            	System.out.println("Task number " + counter + ": " + current);
+            	counter++;
+            }
+            
+            ArrayList<Block> blocks = (ArrayList<Block>) ds.blocksOfCriticalPath(ro);
+            Iterator<Block> it2 = blocks.iterator();
+            counter = 1;
+            System.out.println("\nBLOCKS OF CRITICAL PATH:\n");
+            while(it2.hasNext()) {
+            	Block current = it2.next();
+            	System.out.println("Block number " + counter + ": " + current);
+            	counter++;
+            }
+            
+            counter = 1;
+            System.out.println("\nNEIGFHBORS:\n");
+            ArrayList<Swap> allNbrs = new ArrayList<>();
+            for (Block b : blocks) {
+            	ArrayList<Swap> nbrs = (ArrayList<Swap>) ds.neighbors(b);
+            	allNbrs.addAll(nbrs);
+            	Iterator<Swap> it3 = nbrs.iterator();
+                while(it3.hasNext()) {
+                	Swap current = it3.next();
+                	System.out.println("Swap number " + counter + ": " + current);
+                	counter++;
+                }
+            }
+            
+            System.out.println("\nAPPLY ON:\n");
+            Iterator<Swap> it4 = allNbrs.iterator();
+            counter = 1;
+            while(it4.hasNext()) {
+            	Swap current = it4.next();
+            	System.out.println("Normal ResourceOrder " + counter + ":\n" + ro);
+            	current.applyOn(ro);
+            	System.out.println("Swap number " + counter + ": " + current + "\n");
+            	System.out.println("ResourceOrder number " + counter + ":\n" + ro);
+            	current.applyOn(ro);
+            	counter++;
+            }
+            
+            System.out.println("\nDESCENT SOLVER:\n");
+            Result rs = ds.solve(instance, System.currentTimeMillis() + 1000);
+            System.out.println("SCHEDULE:\n" + rs.schedule);
+            System.out.println("VALID: " + rs.schedule.isValid() + "\n");
+            System.out.println("MAKESPAN: " + rs.schedule.makespan() + "\n");
             
         } catch (IOException e) {
             e.printStackTrace();

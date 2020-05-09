@@ -9,6 +9,7 @@ import java.util.List;
 
 
 import jobshop.solvers.BasicSolver;
+import jobshop.solvers.DescentSolver;
 import jobshop.solvers.EST_PriorityRule;
 import jobshop.solvers.GreedySolver;
 //import jobshop.solvers.PriorityRule;
@@ -32,6 +33,7 @@ public class Main {
         solvers.put("greedy_est_lpt", new GreedySolver(EST_PriorityRule.EST_LPT));
         solvers.put("greedy_est_srpt", new GreedySolver(EST_PriorityRule.EST_SRPT));
         solvers.put("greedy_est_lrpt", new GreedySolver(EST_PriorityRule.EST_LRPT));
+        solvers.put("descent_solver", new DescentSolver());
     }
 
 

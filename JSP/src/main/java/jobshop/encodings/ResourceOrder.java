@@ -118,4 +118,9 @@ public class ResourceOrder extends Encoding {
         return res;
     }
 	
+    /** Creates an exact copy of this resource order. */
+    public ResourceOrder copy() {
+        return new ResourceOrder(this.toSchedule());
+    }
+	
 }
