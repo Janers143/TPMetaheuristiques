@@ -1,0 +1,6 @@
+#myinstance - based on the example given in the 
+3 3 #3 jobs with 3 tasks
+#Pairs of machine-duration
+2 4 0 3 1 2
+1 7 0 6 2 5
+0 2 1 10 2 4
