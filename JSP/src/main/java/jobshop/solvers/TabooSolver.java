@@ -5,21 +5,22 @@ import java.util.List;
 
 import jobshop.Instance;
 import jobshop.Result;
-import jobshop.Result.ExitCause;
 import jobshop.Schedule;
 import jobshop.Solver;
+import jobshop.Result.ExitCause;
 import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
 
 
 /**
- * This class allows you to use a descent method algorithm for solving a JobShop problem
+ * This class allows you to use the taboo algorithm for solving a JobShop problem
  * @author antho
  *
  */
-public class DescentSolver implements Solver {
+public class TabooSolver implements Solver {
 
-	/** 
+	/**
+	 * The same as for Descent Solver
 	 * A block represents a subsequence of the critical path such that all tasks in it execute on the same machine.
      * This class identifies a block in a ResourceOrder representation.
      *
@@ -62,6 +63,7 @@ public class DescentSolver implements Solver {
     }
 
 	/**
+	 * The same as for Descent Solver
 	 * Represents a swap of two tasks on the same machine in a ResourceOrder encoding.
 	 *
 	 * Consider the solution in ResourceOrder representation
@@ -108,57 +110,117 @@ public class DescentSolver implements Solver {
 			return "[Machine : " + this.machine + " | T1 : " + this.t1 + " | T2 : " + this.t2 + "]";
         }
     }
+    
+    /**
+     * The maximum number of iterations for the TabooSolver
+     */
+    private final int maxIter;
+    
+    /**
+     * The number of iterations a swap is forbidden
+     */
+    private final int forbiddenDuration;
 
-    public DescentSolver() {
-    	super();
-    }
+    /**
+     * Constructor
+     * @param maxIter The maximum number of iterations for the TabooSolver
+     * @param tabooDuration The number of iterations a swap is forbidden
+     */
+	public TabooSolver(int maxIter, int tabooDuration) {
+		this.maxIter = maxIter;
+		this.forbiddenDuration = tabooDuration;
+	}
 
-    @Override
-    public Result solve(Instance instance, long deadline) {
-    	// We get an initial solution with the EST_LRPT greedy solver
+	@Override
+	/**
+	 * {@inheritDoc}
+	 */
+	public Result solve(Instance instance, long deadline) {
+		// We get an initial solution with the EST_LRPT greedy solver
         GreedySolver gs = new GreedySolver(EST_PriorityRule.EST_LRPT);
     	Schedule best = gs.solve(instance, deadline).schedule;
+    	Schedule current = best;
     	
-    	ResourceOrder order = null;
+    	// We initialize the other components needed
+    	ResourceOrder currentOrder = null;
     	ExitCause ec = null;
-    	Boolean updated = true;
     	
-    	while(updated && deadline - System.currentTimeMillis() > 1) {
-    		updated = false;
+    	// We create a new matrix that will store all the forbidden permutations
+    	TabooStructure forbiddenSwaps = new TabooStructure(this.forbiddenDuration, instance.numJobs * instance.numTasks);
+    	// We initialize the iteration counter k
+    	int k = 0;
+    	
+    	// Main loop (while we haven't reached the timeout or the max number of iterations)
+    	while(k < this.maxIter && deadline - System.currentTimeMillis() > 1) {
     		// We update the resource order
-    		order = new ResourceOrder(best);
+    		currentOrder = new ResourceOrder(current);
     		// We get all the blocks from the critical path
-    		ArrayList<Block> blocks = (ArrayList<Block>) this.blocksOfCriticalPath(order);
+    		ArrayList<Block> blocks = (ArrayList<Block>) this.blocksOfCriticalPath(currentOrder);
+    		
+    		// Best neighbor schedule in the loop
+    		Schedule bestNeighbor = null;
+    		Swap bestSwap = null;
     		
     		for (Block b : blocks) {
     			// For each block we get all its neighbors
     			ArrayList<Swap> nbrs = (ArrayList<Swap>) this.neighbors(b);
     			
     			for (Swap s : nbrs) {
-    				// For each neighbor, we apply the swap and we check if it is better than the current best solution
-    				s.applyOn(order);
-    				Schedule current = order.toSchedule();
-    				if ((current != null) && (current.makespan() < best.makespan())) {
-    					// We found a better solution
-    					updated = true;
-    					best = current;
+    				// We check if the current swap is allowed
+    				Task t1 = currentOrder.tasksByMachine[s.machine][s.t1];
+    				Task t2 = currentOrder.tasksByMachine[s.machine][s.t2];
+    				boolean allowed = forbiddenSwaps.isAllowed(t1, t2, k, instance.numTasks);
+    				
+    				if (allowed) {
+    					// If the swap is allowed we see if it's the best neighbor
+    					// For each neighbor, we apply the swap and we check if it is better than the current best solution
+        				s.applyOn(currentOrder);
+        				Schedule neighbor = currentOrder.toSchedule();
+        				if ((neighbor != null) && (bestNeighbor == null)) {
+        					// We found the first valid neighbor
+        					bestNeighbor = neighbor;
+        					bestSwap = s;
+        				} else if ((neighbor != null) && (bestNeighbor != null) && (neighbor.makespan() < bestNeighbor.makespan())) {
+        					// We found a better neighbor than the one we had before
+        					bestNeighbor = neighbor;
+        					bestSwap = s;
+        				}
+        				s.applyOn(currentOrder);
     				}
-    				s.applyOn(order);
     			}	
     		}
+    		
+    		// Now we have the best valid neighbor from all neighbors of the current schedule
+    		// We check if it is better than the global best
+    		if ((bestNeighbor != null) && (bestNeighbor.makespan() < best.makespan())) {
+    			// We found a better solution than the one we had before
+    			best = bestNeighbor;
+    			// We forbid the opposite swap of the one we have made
+    			// We have made t1<->t2 so we forbid t2<->t1
+    			Task t1 = currentOrder.tasksByMachine[bestSwap.machine][bestSwap.t1];
+				Task t2 = currentOrder.tasksByMachine[bestSwap.machine][bestSwap.t2];
+    			forbiddenSwaps.addTaboo(t2, t1, k, instance.numTasks);
+    		}
+    		
+    		// We update the current schedule with the one of the best neighbor
+    		if (bestNeighbor != null) {
+    			current = bestNeighbor;
+    		}
+    		// Increasing the iteration counter
+    		k++;
     	}
     	
-    	// Check if the algorithm ended because of a timeout or because it was blocked
-    	if (updated) {
-    		ec = Result.ExitCause.Timeout;
-    	} else {
+    	if (k == this.maxIter) {
     		ec = Result.ExitCause.Blocked;
+    	} else {
+    		ec = Result.ExitCause.Timeout;
     	}
     	
-    	return new Result(instance, best, ec);
-    }
-
-    /** 
+		return new Result(instance, best, ec);
+	}
+	
+	/** 
+	 * The same as for Descent Solver
      * Returns a list of all blocks of the critical path. 
      * @param order A Resource Order of which we have to extract the blocks of the critical path 
      * @return A list with the blocks of the critical path 
@@ -215,6 +277,7 @@ public class DescentSolver implements Solver {
     }
 
     /** 
+     * The same as for Descent Solver
      * For a given block, return the possible swaps for the Nowicki and Smutnicki neighborhood
      * @param A block of which we extract the neighbors
      * @return A list of Swaps that represent the neighbors of the current solution
@@ -238,4 +301,5 @@ public class DescentSolver implements Solver {
         
         return nbrs;
     }
+
 }

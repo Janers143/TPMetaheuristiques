@@ -12,8 +12,10 @@ import jobshop.solvers.BasicSolver;
 import jobshop.solvers.DescentSolver;
 import jobshop.solvers.EST_PriorityRule;
 import jobshop.solvers.GreedySolver;
+import jobshop.solvers.PriorityRule;
 //import jobshop.solvers.PriorityRule;
 import jobshop.solvers.RandomSolver;
+import jobshop.solvers.TabooSolver;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
@@ -29,11 +31,21 @@ public class Main {
         solvers.put("basic", new BasicSolver());
         solvers.put("random", new RandomSolver());
         // add new solvers here
+        solvers.put("greedy_spt", new GreedySolver(PriorityRule.SPT));
+        solvers.put("greedy_lpt", new GreedySolver(PriorityRule.LPT));
+        solvers.put("greedy_srpt", new GreedySolver(PriorityRule.SRPT));
+        solvers.put("greedy_lrpt", new GreedySolver(PriorityRule.LRPT));
+        
         solvers.put("greedy_est_spt", new GreedySolver(EST_PriorityRule.EST_SPT));
         solvers.put("greedy_est_lpt", new GreedySolver(EST_PriorityRule.EST_LPT));
         solvers.put("greedy_est_srpt", new GreedySolver(EST_PriorityRule.EST_SRPT));
         solvers.put("greedy_est_lrpt", new GreedySolver(EST_PriorityRule.EST_LRPT));
+        
         solvers.put("descent_solver", new DescentSolver());
+        solvers.put("taboo_solver", new TabooSolver(1, 1));
+        /*la01 la02 la03 la04 la05 la06 la07 la08 la09 la10 la11 la12 la13
+          la14 la15 la16 la17 la18 la19 la20 la21 la22 la23 la24 la25 la26 
+          la27 la28 la29 la30 la31 la32 la33 la34 la35 la36 la37 la38 la39 la40*/
     }
 
 

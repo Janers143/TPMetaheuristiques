@@ -9,6 +9,7 @@ import jobshop.solvers.DescentSolver.Swap;
 import jobshop.solvers.EST_PriorityRule;
 import jobshop.solvers.GreedySolver;
 import jobshop.solvers.PriorityRule;
+import jobshop.solvers.TabooSolver;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -171,6 +172,7 @@ public class DebuggingMain {
             
             DescentSolver ds = new DescentSolver();
             
+            // Test for criticalPath
             List<Task> criticalPath = (List<Task>) sched.criticalPath();
             Iterator<Task> it1 = criticalPath.iterator();
             int counter = 1;
@@ -181,6 +183,7 @@ public class DebuggingMain {
             	counter++;
             }
             
+            // Test for blocksOfCriticalPath
             ArrayList<Block> blocks = (ArrayList<Block>) ds.blocksOfCriticalPath(ro);
             Iterator<Block> it2 = blocks.iterator();
             counter = 1;
@@ -191,6 +194,7 @@ public class DebuggingMain {
             	counter++;
             }
             
+            // Test for neighbors
             counter = 1;
             System.out.println("\nNEIGFHBORS:\n");
             ArrayList<Swap> allNbrs = new ArrayList<>();
@@ -205,6 +209,7 @@ public class DebuggingMain {
                 }
             }
             
+            // Test for applyOn
             System.out.println("\nAPPLY ON:\n");
             Iterator<Swap> it4 = allNbrs.iterator();
             counter = 1;
@@ -218,11 +223,21 @@ public class DebuggingMain {
             	counter++;
             }
             
+            // Test for solve
             System.out.println("\nDESCENT SOLVER:\n");
             Result rs = ds.solve(instance, System.currentTimeMillis() + 1000);
             System.out.println("SCHEDULE:\n" + rs.schedule);
             System.out.println("VALID: " + rs.schedule.isValid() + "\n");
             System.out.println("MAKESPAN: " + rs.schedule.makespan() + "\n");
+            
+            /* Tests for the taboo solver */
+            // Test for solve
+            TabooSolver taboo = new TabooSolver(5, 3);
+            System.out.println("\nTABOO SOLVER:\n");
+            Result rs_taboo = taboo.solve(instance, System.currentTimeMillis() + 1000);
+            System.out.println("SCHEDULE:\n" + rs_taboo.schedule);
+            System.out.println("VALID: " + rs_taboo.schedule.isValid() + "\n");
+            System.out.println("MAKESPAN: " + rs_taboo.schedule.makespan() + "\n");
             
         } catch (IOException e) {
             e.printStackTrace();

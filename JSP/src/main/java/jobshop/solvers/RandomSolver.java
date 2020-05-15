@@ -29,7 +29,6 @@ public class RandomSolver implements Solver {
             }
         }
 
-
         return new Result(instance, best, Result.ExitCause.Timeout);
     }
 

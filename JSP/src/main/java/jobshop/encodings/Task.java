@@ -39,7 +39,22 @@ public final class Task {
         return "Job " + this.job + " Task " + this.task;
     }
     
+    /**
+     * Function I have added to make a prettier print function
+     * @return A new Task that has 1 added to its job and its task nb
+     */
     public Task add_one() {
     	return new Task(this.job + 1, this.task + 1);
     }
+
+    /**
+     * Function I have added to get an ID for each task that goes 
+     * from 0 to the total number of tasks.
+     * @param numTasks The number of tasks ther is for each job
+     * @return An int ID for the task
+     * @see jobshop.solvers.TabooStructure#tabooPerms
+     */
+	public int getTaskID(int numTasks) {
+		return (this.job * numTasks + this.task);
+	}
 }

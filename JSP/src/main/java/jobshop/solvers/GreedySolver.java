@@ -74,8 +74,10 @@ public class GreedySolver implements Solver {
 			int currentMachine = instance.machine(currentJob, currentTask);
 			int currentDuration = instance.duration(currentJob, currentTask);
 			
-			nextStartTimeJobs[currentJob] += currentDuration;
-			nextStartTimeMachines[currentMachine] += currentDuration;
+			int currentStartTime = Integer.max(nextStartTimeJobs[currentJob], nextStartTimeMachines[currentMachine]);
+			
+			nextStartTimeJobs[currentJob] += currentStartTime + currentDuration;
+			nextStartTimeMachines[currentMachine] += currentStartTime + currentDuration;
 			
 			// We remove the current task from the feasable list
 			feasable.remove(current);

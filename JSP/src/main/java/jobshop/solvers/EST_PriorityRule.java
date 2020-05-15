@@ -145,7 +145,7 @@ public enum EST_PriorityRule {
 		// We search the min starting time for the tasks in feasable list
 		int minStartTime = Integer.MAX_VALUE;
 		
-		// ArrayLists with all the Tasks with the same min start time
+		// ArrayList with all the Tasks with the same min start time
 		ArrayList<Task> sameStartTime = new ArrayList<>();
 		
 		for (Task t: feasable) {
