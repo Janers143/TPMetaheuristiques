@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import jobshop.encodings.Task;
+
 public class Instance {
 
     /** Number of jobs in the instance */
@@ -20,6 +22,8 @@ public class Instance {
 
     final int[][] durations;
     final int[][] machines;
+    
+    public final Path path;
 
     public int duration(int job, int task) {
         return durations[job][task];
@@ -37,8 +41,9 @@ public class Instance {
         throw new RuntimeException("No task targeting machine "+wanted_machine+" on job "+job);
     }
 
-    Instance(int numJobs, int numTasks) {
-        this.numJobs = numJobs;
+    Instance(int numJobs, int numTasks, Path pth) {
+        this.path = pth;
+		this.numJobs = numJobs;
         this.numTasks = numTasks;
         this.numMachines = numTasks;
 
@@ -55,7 +60,7 @@ public class Instance {
         Scanner header = new Scanner(lines.next());
         int num_jobs = header.nextInt();
         int num_tasks = header.nextInt();
-        Instance pb = new Instance(num_jobs, num_tasks);
+        Instance pb = new Instance(num_jobs, num_tasks, path);
 
         for(int job = 0 ; job<num_jobs ; job++) {
             Scanner line = new Scanner(lines.next());
@@ -70,4 +75,7 @@ public class Instance {
  
         return pb;
     }
+	public int machine(Task task) {
+		return this.machine(task.job, task.task);
+	}
 }

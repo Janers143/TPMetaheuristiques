@@ -42,7 +42,12 @@ public class Main {
         solvers.put("greedy_est_lrpt", new GreedySolver(EST_PriorityRule.EST_LRPT));
         
         solvers.put("descent_solver", new DescentSolver());
-        solvers.put("taboo_solver", new TabooSolver(1, 1));
+        solvers.put("taboo_solver1", new TabooSolver(1, 1));
+        solvers.put("taboo_solver2", new TabooSolver(10, 3));
+        solvers.put("taboo_solver3", new TabooSolver(100, 5));
+        solvers.put("taboo_solver4", new TabooSolver(1000, 10));
+        solvers.put("taboo_solver5", new TabooSolver(5000, 10));
+        solvers.put("taboo_solver6", new TabooSolver(50000, 15));
         /*la01 la02 la03 la04 la05 la06 la07 la08 la09 la10 la11 la12 la13
           la14 la15 la16 la17 la18 la19 la20 la21 la22 la23 la24 la25 la26 
           la27 la28 la29 la30 la31 la32 la33 la34 la35 la36 la37 la38 la39 la40*/

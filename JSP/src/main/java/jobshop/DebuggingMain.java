@@ -11,6 +11,7 @@ import jobshop.solvers.GreedySolver;
 import jobshop.solvers.PriorityRule;
 import jobshop.solvers.TabooSolver;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -143,7 +144,9 @@ public class DebuggingMain {
             System.out.println("MAKESPAN: " + estLrptRs.schedule.makespan() + "\n");
             */
         	
+        	
         	/* Tests for the descent solver */
+        	/*
         	// load the aaa1 instance
             Instance instance = Instance.fromFile(Paths.get("instances/myinstance"));
         	ResourceOrder ro = new ResourceOrder(instance);
@@ -229,8 +232,9 @@ public class DebuggingMain {
             System.out.println("SCHEDULE:\n" + rs.schedule);
             System.out.println("VALID: " + rs.schedule.isValid() + "\n");
             System.out.println("MAKESPAN: " + rs.schedule.makespan() + "\n");
-            
+            */
             /* Tests for the taboo solver */
+        	/*
             // Test for solve
             TabooSolver taboo = new TabooSolver(5, 3);
             System.out.println("\nTABOO SOLVER:\n");
@@ -238,6 +242,105 @@ public class DebuggingMain {
             System.out.println("SCHEDULE:\n" + rs_taboo.schedule);
             System.out.println("VALID: " + rs_taboo.schedule.isValid() + "\n");
             System.out.println("MAKESPAN: " + rs_taboo.schedule.makespan() + "\n");
+            */
+        	
+        	/* Writing in a CSV File */
+        	//Instances
+        	ArrayList<Instance> instances = new ArrayList<>();
+        	Instance ft06 = Instance.fromFile(Paths.get("instances/", "ft06")); instances.add(ft06);
+        	Instance ft10 = Instance.fromFile(Paths.get("instances/", "ft10")); instances.add(ft10);
+        	Instance ft20 = Instance.fromFile(Paths.get("instances/", "ft20")); instances.add(ft20);
+        	Instance la01 = Instance.fromFile(Paths.get("instances/", "la01")); instances.add(la01);
+        	Instance la02 = Instance.fromFile(Paths.get("instances/", "la02")); instances.add(la02);
+        	Instance la03 = Instance.fromFile(Paths.get("instances/", "la03")); instances.add(la03);
+        	Instance la04 = Instance.fromFile(Paths.get("instances/", "la04")); instances.add(la04);
+        	Instance la05 = Instance.fromFile(Paths.get("instances/", "la05")); instances.add(la05);
+        	Instance la06 = Instance.fromFile(Paths.get("instances/", "la06")); instances.add(la06);
+        	Instance la07 = Instance.fromFile(Paths.get("instances/", "la07")); instances.add(la07);
+        	Instance la08 = Instance.fromFile(Paths.get("instances/", "la08")); instances.add(la08);
+        	Instance la09 = Instance.fromFile(Paths.get("instances/", "la09")); instances.add(la09);
+        	Instance la10 = Instance.fromFile(Paths.get("instances/", "la10")); instances.add(la10);
+        	Instance la11 = Instance.fromFile(Paths.get("instances/", "la11")); instances.add(la11);
+        	Instance la12 = Instance.fromFile(Paths.get("instances/", "la12")); instances.add(la12);
+        	Instance la13 = Instance.fromFile(Paths.get("instances/", "la13")); instances.add(la13);
+        	Instance la14 = Instance.fromFile(Paths.get("instances/", "la14")); instances.add(la14);
+        	Instance la15 = Instance.fromFile(Paths.get("instances/", "la15")); instances.add(la15);
+        	Instance la16 = Instance.fromFile(Paths.get("instances/", "la16")); instances.add(la16);
+        	Instance la17 = Instance.fromFile(Paths.get("instances/", "la17")); instances.add(la17);
+        	Instance la18 = Instance.fromFile(Paths.get("instances/", "la18")); instances.add(la18);
+        	Instance la19 = Instance.fromFile(Paths.get("instances/", "la19")); instances.add(la19);
+        	Instance la20 = Instance.fromFile(Paths.get("instances/", "la20")); instances.add(la20);
+        	Instance la21 = Instance.fromFile(Paths.get("instances/", "la21")); instances.add(la21);
+        	Instance la22 = Instance.fromFile(Paths.get("instances/", "la22")); instances.add(la22);
+        	Instance la23 = Instance.fromFile(Paths.get("instances/", "la23")); instances.add(la23);
+        	Instance la24 = Instance.fromFile(Paths.get("instances/", "la24")); instances.add(la24);
+        	Instance la25 = Instance.fromFile(Paths.get("instances/", "la25")); instances.add(la25);
+        	Instance la26 = Instance.fromFile(Paths.get("instances/", "la26")); instances.add(la26);
+        	Instance la27 = Instance.fromFile(Paths.get("instances/", "la27")); instances.add(la27);
+        	Instance la28 = Instance.fromFile(Paths.get("instances/", "la28")); instances.add(la28);
+        	Instance la29 = Instance.fromFile(Paths.get("instances/", "la29")); instances.add(la29);
+        	Instance la30 = Instance.fromFile(Paths.get("instances/", "la30")); instances.add(la30);
+        	Instance la31 = Instance.fromFile(Paths.get("instances/", "la31")); instances.add(la31);
+        	Instance la32 = Instance.fromFile(Paths.get("instances/", "la32")); instances.add(la32);
+        	Instance la33 = Instance.fromFile(Paths.get("instances/", "la33")); instances.add(la33);
+        	Instance la34 = Instance.fromFile(Paths.get("instances/", "la34")); instances.add(la34);
+        	Instance la35 = Instance.fromFile(Paths.get("instances/", "la35")); instances.add(la35);
+        	Instance la36 = Instance.fromFile(Paths.get("instances/", "la36")); instances.add(la36);
+        	Instance la37 = Instance.fromFile(Paths.get("instances/", "la37")); instances.add(la37);
+        	Instance la38 = Instance.fromFile(Paths.get("instances/", "la38")); instances.add(la38);
+        	Instance la39 = Instance.fromFile(Paths.get("instances/", "la39")); instances.add(la39);
+        	Instance la40 = Instance.fromFile(Paths.get("instances/", "la40")); instances.add(la40);
+        	
+        	//Solvers
+        	GreedySolver EST_LRPT_sol = new GreedySolver(EST_PriorityRule.EST_LRPT);
+        	GreedySolver LRPT_sol = new GreedySolver(PriorityRule.LRPT);
+        	
+        	DescentSolver descent_sol = new DescentSolver();
+        	TabooSolver taboo_sol_1_1 = new TabooSolver(1,1);
+        	TabooSolver taboo_sol_10_3 = new TabooSolver(10,3);
+        	TabooSolver taboo_sol_100_5 = new TabooSolver(100,5);
+        	TabooSolver taboo_sol_1000_10 = new TabooSolver(1000,10);
+        	TabooSolver taboo_sol_5000_10 = new TabooSolver(5000,10);
+        	
+        	//FileWritter
+        	FileWriter csvWriter = new FileWriter("Different_taboos_results.csv");
+        	csvWriter.append("Instance,DescentSolver,TabooSolver(1_1),TabooSolver(10_3),TabooSolver(100_5),TabooSolver(1000_10),TabooSolver(5000_10)\n");
+        	for (int i = 0; i < instances.size(); i++) {
+        		Instance current = instances.get(i);
+	        	String instanceName = current.path.toString().substring(10, 14);
+	        	csvWriter.append(instanceName + ",");
+	        	
+	        	int bestKnown =  BestKnownResult.of(instanceName);
+	        	
+	        	int makespan = descent_sol.solve(current, System.currentTimeMillis() + 10000).schedule.makespan();
+	        	float dist = 100f * (makespan - bestKnown) / (float) bestKnown;
+	        	csvWriter.append(Float.toString(dist) + ",");
+	        	
+	        	makespan = taboo_sol_1_1.solve(current, System.currentTimeMillis() + 10000).schedule.makespan();
+	        	dist = 100f * (makespan - bestKnown) / (float) bestKnown;
+	        	csvWriter.append(Float.toString(dist) + ",");
+	        	
+	        	makespan = taboo_sol_10_3.solve(current, System.currentTimeMillis() + 10000).schedule.makespan();
+	        	dist = 100f * (makespan - bestKnown) / (float) bestKnown;
+	        	csvWriter.append(Float.toString(dist) + ",");
+	        	
+	        	makespan = taboo_sol_100_5.solve(current, System.currentTimeMillis() + 10000).schedule.makespan();
+	        	dist = 100f * (makespan - bestKnown) / (float) bestKnown;
+	        	csvWriter.append(Float.toString(dist) + ",");
+	        	
+	        	makespan = taboo_sol_1000_10.solve(current, System.currentTimeMillis() + 10000).schedule.makespan();
+	        	dist = 100f * (makespan - bestKnown) / (float) bestKnown;
+	        	csvWriter.append(Float.toString(dist) + ",");
+	        	
+	        	makespan = taboo_sol_5000_10.solve(current, System.currentTimeMillis() + 10000).schedule.makespan();
+	        	dist = 100f * (makespan - bestKnown) / (float) bestKnown;
+	        	csvWriter.append(Float.toString(dist) + "\n");
+	        	
+	        	System.out.println("Finished instance " + i);
+        	}
+        	
+        	csvWriter.flush();
+        	csvWriter.close();
             
         } catch (IOException e) {
             e.printStackTrace();

@@ -124,6 +124,7 @@ public class DescentSolver implements Solver {
     	Boolean updated = true;
     	
     	while(updated && deadline - System.currentTimeMillis() > 1) {
+    		//System.out.println("here");
     		updated = false;
     		// We update the resource order
     		order = new ResourceOrder(best);

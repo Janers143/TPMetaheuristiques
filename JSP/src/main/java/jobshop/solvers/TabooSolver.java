@@ -139,6 +139,7 @@ public class TabooSolver implements Solver {
 		// We get an initial solution with the EST_LRPT greedy solver
         GreedySolver gs = new GreedySolver(EST_PriorityRule.EST_LRPT);
     	Schedule best = gs.solve(instance, deadline).schedule;
+    	int bestMakespan = best.makespan();
     	Schedule current = best;
     	
     	// We initialize the other components needed
@@ -151,7 +152,8 @@ public class TabooSolver implements Solver {
     	int k = 0;
     	
     	// Main loop (while we haven't reached the timeout or the max number of iterations)
-    	while(k < this.maxIter && deadline - System.currentTimeMillis() > 1) {
+    	while(k < this.maxIter && (deadline - System.currentTimeMillis()) > 1) {
+    		
     		// We update the resource order
     		currentOrder = new ResourceOrder(current);
     		// We get all the blocks from the critical path
@@ -174,8 +176,9 @@ public class TabooSolver implements Solver {
     				if (allowed) {
     					// If the swap is allowed we see if it's the best neighbor
     					// For each neighbor, we apply the swap and we check if it is better than the current best solution
-        				s.applyOn(currentOrder);
-        				Schedule neighbor = currentOrder.toSchedule();
+    					ResourceOrder neighborRO = currentOrder.copy();
+        				s.applyOn(neighborRO);
+        				Schedule neighbor = neighborRO.toSchedule();
         				if ((neighbor != null) && (bestNeighbor == null)) {
         					// We found the first valid neighbor
         					bestNeighbor = neighbor;
@@ -185,16 +188,19 @@ public class TabooSolver implements Solver {
         					bestNeighbor = neighbor;
         					bestSwap = s;
         				}
-        				s.applyOn(currentOrder);
     				}
     			}	
     		}
     		
     		// Now we have the best valid neighbor from all neighbors of the current schedule
     		// We check if it is better than the global best
-    		if ((bestNeighbor != null) && (bestNeighbor.makespan() < best.makespan())) {
-    			// We found a better solution than the one we had before
-    			best = bestNeighbor;
+    		if (bestNeighbor != null) {
+    			
+    			if (bestNeighbor.makespan() < bestMakespan) {
+	    			// We found a better solution than the one we had before
+	    			best = bestNeighbor;
+	    			bestMakespan = bestNeighbor.makespan();
+    			}
     			// We forbid the opposite swap of the one we have made
     			// We have made t1<->t2 so we forbid t2<->t1
     			Task t1 = currentOrder.tasksByMachine[bestSwap.machine][bestSwap.t1];
@@ -204,7 +210,7 @@ public class TabooSolver implements Solver {
     		
     		// We update the current schedule with the one of the best neighbor
     		if (bestNeighbor != null) {
-    			current = bestNeighbor;
+    			current = bestNeighbor.copy();
     		}
     		// Increasing the iteration counter
     		k++;
